@@ -1,8 +1,11 @@
+import {length} from "autoprefixer";
+
 export class Crypto {
 	private _alphabet: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz'
 	private _plain: string = ''
 	private _cipher: string = ''
 	private _key: any
+	private _playfairTable: any;
 	constructor(alphabet?: string) {
 		if (alphabet) this._alphabet = alphabet
 	}
@@ -14,7 +17,6 @@ export class Crypto {
 		}
 		return result
 	}
-
 
 	get alphabet(): string {
 		return this._alphabet;
@@ -46,6 +48,14 @@ export class Crypto {
 
 	set key(value: any) {
 		this._key = value;
+	}
+
+	get playfairTable(): any {
+		return this._playfairTable;
+	}
+
+	set playfairTable(value: any) {
+		this._playfairTable = value;
 	}
 
 	ceasarEncrypt = () => {
@@ -93,14 +103,20 @@ export class Crypto {
 
 	playfairEncrypt = (word: string) => {
 		this.key = word
-		// create key
+		// creating matrix key from keyword
 		const mySet: Set<string> = new Set<string>()
 		let newWord: string = word.toLowerCase().trim()
-		while (newWord.includes(" "))
+		while (newWord.includes(" ") || newWord.includes("j"))
 		{
 			newWord = newWord.replace(' ','')
+			newWord = newWord.replace('j','i')
 		}
-		const dict = 'abcdefghijklmnopqrstuvwxyz'
+		while (this.plain.includes(" ") || this.plain.includes("j"))
+		{
+			this.plain = this.plain.replace(' ','')
+			this.plain = this.plain.replace('j','i')
+		}
+		const dict = 'abcdefghiklmnopqrstuvwxyz'
 		for (let i = 0; i < newWord.length; ++i)
 		{
 			mySet.add(newWord[i])
@@ -109,20 +125,222 @@ export class Crypto {
 		mySet.forEach( (key,val) => keyString+=key.toString() )
 		for (let i = 0; i<dict.length; ++i)
 		{
-			if (!keyString.includes(dict[i]) && dict[i]!= "j")
+			if (!keyString.includes(dict[i]))
 			{
 				keyString += dict[i]
 			}
 		}
-		const matrixKey : String[][] = []
+		const matrixKey : string[][] = []
 		for (let i= 0; i<5; i++)
 		{
-			const row : String[] = []
+			const row : string[] = []
 			for (let j=0; j<5; j++)
 			{
 				row[j]= keyString[5*i + j]
 			}
 			matrixKey.push(row)
 		}
+		this.playfairTable = matrixKey
+		// spliting plaintext into an array contains only 2-char elements
+		const plaintext: string = this._plain
+		newWord = plaintext.toLowerCase().trim()
+		while (newWord.includes(" "))
+		{
+			newWord = newWord.replace(' ','')
+		}
+		let temporaryWord: string =  newWord
+		let saveClusters: string[] = []
+		while (temporaryWord.length > 0 )
+		{
+			// case 1: only have 1 char
+			if (temporaryWord.length === 1)
+			{
+				let cluster: string = temporaryWord + "x"
+				saveClusters.push(cluster)
+				temporaryWord = ""
+			} else
+			{
+				if (temporaryWord[0] != temporaryWord[1])
+				{
+					let cluster: string = temporaryWord[0] + temporaryWord[1]
+					saveClusters.push(cluster)
+					temporaryWord = temporaryWord.slice(2)
+				} else
+				{
+					let cluster: string = temporaryWord[0] + "x"
+					saveClusters.push(cluster)
+					temporaryWord = temporaryWord.slice(1)
+				}
+			}
+		}
+
+
+		// encrypt
+		const lookupTable: string[][] = matrixKey
+		const plain: string[] = saveClusters
+		const findIndex: any = (array: any[], value: any) => {
+			if (!Array.isArray(array)) return;
+			let i = array.indexOf(value), temp;
+			if (i !== -1) return [i];
+			i = array.findIndex(v => temp = findIndex(v, value));
+			if (i !== -1) return [i, ...temp];
+		}
+
+		const cipher: string[] = []
+
+		for (let i= 0; i < plain.length; ++i)
+		{
+			// console.log(plain[i][0], plain[i][1])
+			const firstIndexes: any = findIndex(lookupTable, plain[i][0])
+			const secondIndexes: any = findIndex(lookupTable, plain[i][1])
+			let result: any;
+			// in the same row
+			if (firstIndexes[0] === secondIndexes[0])
+			{
+				let firstResult: string = lookupTable[firstIndexes[0]][(firstIndexes[1]+1)%5]
+				let secondResult: string = lookupTable[secondIndexes[0]][(secondIndexes[1]+1)%5]
+				result = [firstResult, secondResult]
+			}
+
+			// in the same column
+			else if (firstIndexes[1] === secondIndexes[1])
+			{
+				let firstResult: string = lookupTable[(firstIndexes[0]+1)%5][firstIndexes[1]]
+				let secondResult: string = lookupTable[(secondIndexes[0]+1)%5][secondIndexes[1]]
+				result = [firstResult, secondResult]
+			}
+
+			// sole
+			else
+			{
+				let firstResult: string = lookupTable[firstIndexes[0]][secondIndexes[1]]
+				let secondResult: string = lookupTable[secondIndexes[0]][firstIndexes[1]]
+				result = [firstResult, secondResult]
+			}
+			cipher.push(result[0]+result[1])
+		}
+		this._cipher = cipher.reduce((x, y, i) => y = x+ cipher[i], "")
+	}
+
+	playfairDecrypt = (word: string) =>
+	{
+		this.key = word
+		// creating matrix key from keyword
+		const mySet: Set<string> = new Set<string>()
+		let newWord: string = word.toLowerCase().trim()
+		while (newWord.includes(" ") || newWord.includes("j"))
+		{
+			newWord = newWord.replace(' ','')
+			newWord = newWord.replace('j','i')
+		}
+		while (this.cipher.includes(" ") || this.cipher.includes("j"))
+		{
+			this.cipher = this.cipher.replace(' ','')
+			this.cipher = this.cipher.replace('j','i')
+		}
+		const dict = 'abcdefghiklmnopqrstuvwxyz'
+		for (let i = 0; i < newWord.length; ++i)
+		{
+			mySet.add(newWord[i])
+		}
+		let keyString: string = ""
+		mySet.forEach( (key,val) => keyString+=key.toString() )
+		for (let i = 0; i<dict.length; ++i)
+		{
+			if (!keyString.includes(dict[i]))
+			{
+				keyString += dict[i]
+			}
+		}
+		const matrixKey : string[][] = []
+		for (let i= 0; i<5; i++)
+		{
+			const row : string[] = []
+			for (let j=0; j<5; j++)
+			{
+				row[j]= keyString[5*i + j]
+			}
+			matrixKey.push(row)
+		}
+		this.playfairTable = matrixKey
+		// spliting plaintext into an array contains only 2-char elements
+		const ciphertext: string = this.cipher
+		newWord = ciphertext.toLowerCase().trim()
+		while (newWord.includes(" "))
+		{
+			newWord = newWord.replace(' ','')
+		}
+		let temporaryWord: string =  newWord
+		let saveClusters: string[] = []
+		while (temporaryWord.length > 0 )
+		{
+			// case 1: only have 1 char
+			if (temporaryWord.length === 1)
+			{
+				let cluster: string = temporaryWord + "x"
+				saveClusters.push(cluster)
+				temporaryWord = ""
+			} else
+			{
+				if (temporaryWord[0] != temporaryWord[1])
+				{
+					let cluster: string = temporaryWord[0] + temporaryWord[1]
+					saveClusters.push(cluster)
+					temporaryWord = temporaryWord.slice(2)
+				} else
+				{
+					let cluster: string = temporaryWord[0] + "x"
+					saveClusters.push(cluster)
+					temporaryWord = temporaryWord.slice(1)
+				}
+			}
+		}
+
+
+		// decrypt
+		const lookupTable: string[][] = matrixKey
+		const cipher: string[] = saveClusters
+		const findIndex: any = (array: any[], value: any) => {
+			if (!Array.isArray(array)) return;
+			let i = array.indexOf(value), temp;
+			if (i !== -1) return [i];
+			i = array.findIndex(v => temp = findIndex(v, value));
+			if (i !== -1) return [i, ...temp];
+		}
+
+		const plain: string[] = []
+
+		for (let i= 0; i < cipher.length; ++i)
+		{
+			// console.log(plain[i][0], plain[i][1])
+			const firstIndexes: any = findIndex(lookupTable, cipher[i][0])
+			const secondIndexes: any = findIndex(lookupTable, cipher[i][1])
+			let result: any;
+			// in the same row
+			if (firstIndexes[0] === secondIndexes[0])
+			{
+				let firstResult: string = lookupTable[firstIndexes[0]][(firstIndexes[1]-1+5)%5]
+				let secondResult: string = lookupTable[secondIndexes[0]][(secondIndexes[1]-1+5)%5]
+				result = [firstResult, secondResult]
+			}
+
+			// in the same column
+			else if (firstIndexes[1] === secondIndexes[1])
+			{
+				let firstResult: string = lookupTable[(firstIndexes[0]-1+5)%5][firstIndexes[1]]
+				let secondResult: string = lookupTable[(secondIndexes[0]-1+5)%5][secondIndexes[1]]
+				result = [firstResult, secondResult]
+			}
+
+			// sole
+			else
+			{
+				let firstResult: string = lookupTable[firstIndexes[0]][secondIndexes[1]]
+				let secondResult: string = lookupTable[secondIndexes[0]][firstIndexes[1]]
+				result = [firstResult, secondResult]
+			}
+			plain.push(result[0]+result[1])
+		}
+		this._plain = plain.reduce((x, y, i) => y = x+ plain[i], "")
 	}
 }

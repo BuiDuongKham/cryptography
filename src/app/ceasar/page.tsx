@@ -10,7 +10,7 @@ export default function CeasarPage() {
 	const [key, setKey] = React.useState(0)
 	const [plainText, setPlainText] = React.useState<string>('')
 	const [cipherText, setCipherText] = React.useState<string>('')
-	const [mode, setMode] = React.useState('decrypt')
+	const [mode, setMode] = React.useState('encrypt')
 
 	// logic
 
@@ -39,7 +39,7 @@ export default function CeasarPage() {
 				<div className={'flex flex-col justify-center'}>
 					<div className={'flex justify-center text-2xl font-bold'}> Key </div>
 					<div className={'flex justify-center'}>
-						<input type={'number'} value={key} onChange={(e) => setKey(parseInt(e.target.value)%26)} />
+						<input type={'number'} value={key} onChange={(e) => setKey((parseInt(e.target.value)+26)%26)} />
 					</div>
 					<div className={'flex justify-center'}>
 						<button className={'px-20 py-2 bg-blue-300 hover:text-white hover:bg-emerald-600 transition-all duration-500'} onClick={() => setMode(mode === 'encrypt' ? 'decrypt' : 'encrypt')}>
