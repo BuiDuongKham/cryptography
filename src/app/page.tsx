@@ -8,6 +8,9 @@ export default function Home() {
 					<a href={'/ceasar'} className={'px-20 py-2 bg-blue-300 hover:text-white hover:bg-emerald-600 transition-all duration-500'}>
 						Ceasar
 					</a>
+					<a href={'/playfair'} className={'px-20 py-2 bg-blue-300 hover:text-white hover:bg-emerald-600 transition-all duration-500'}>
+						Playfair
+					</a>
 				</div>
 				<div className={'min-h-full px-20 mx-10 bg-blue-700'}>
 					Hello

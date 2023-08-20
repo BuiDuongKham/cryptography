@@ -90,4 +90,39 @@ export class Crypto {
 		}
 		this._plain = plain
 	}
+
+	playfairEncrypt = (word: string) => {
+		this.key = word
+		// create key
+		const mySet: Set<string> = new Set<string>()
+		let newWord: string = word.toLowerCase().trim()
+		while (newWord.includes(" "))
+		{
+			newWord = newWord.replace(' ','')
+		}
+		const dict = 'abcdefghijklmnopqrstuvwxyz'
+		for (let i = 0; i < newWord.length; ++i)
+		{
+			mySet.add(newWord[i])
+		}
+		let keyString: string = ""
+		mySet.forEach( (key,val) => keyString+=key.toString() )
+		for (let i = 0; i<dict.length; ++i)
+		{
+			if (!keyString.includes(dict[i]) && dict[i]!= "j")
+			{
+				keyString += dict[i]
+			}
+		}
+		const matrixKey : String[][] = []
+		for (let i= 0; i<5; i++)
+		{
+			const row : String[] = []
+			for (let j=0; j<5; j++)
+			{
+				row[j]= keyString[5*i + j]
+			}
+			matrixKey.push(row)
+		}
+	}
 }
