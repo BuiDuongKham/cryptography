@@ -1,4 +1,5 @@
-import {length} from "autoprefixer";
+import {Vector, Matrix} from "ts-matrix";
+import {relativizeURL} from "next/dist/shared/lib/router/utils/relativize-url";
 
 export class Crypto {
 	private _alphabet: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz'
@@ -222,8 +223,7 @@ export class Crypto {
 		this._cipher = cipher.reduce((x, y, i) => y = x+ cipher[i], "")
 	}
 
-	playfairDecrypt = (word: string) =>
-	{
+	playfairDecrypt = (word: string) => {
 		this.key = word
 		// creating matrix key from keyword
 		const mySet: Set<string> = new Set<string>()
@@ -342,5 +342,184 @@ export class Crypto {
 			plain.push(result[0]+result[1])
 		}
 		this._plain = plain.reduce((x, y, i) => y = x+ plain[i], "")
+	}
+
+	hillEncrypt = (keyMatrix: number[][] | undefined) => {
+		let plainText: string = this._plain
+		if (!keyMatrix) return;
+		const matrix = new Matrix(keyMatrix.length, keyMatrix[0].length, keyMatrix)
+		if (matrix.determinant() === 0) {this.cipher='Ma trận không khả nghịch';return;}
+
+		const n: number = keyMatrix.length
+
+		plainText = plainText.toLowerCase().trim()
+
+		while (plainText.includes(" "))
+		{
+			plainText = plainText.replace(" ",'')
+		}
+
+		let plainNumber = []
+
+		for (let i = 0 ; i < plainText.length ; ++i)
+		{
+			plainNumber.push(plainText.charCodeAt(i)-97)
+		}
+
+		let preprocessArray: number[][] = []
+		let k = 0
+
+
+		while (k+n <= plainNumber.length)
+		{
+			let slice: number[] = plainNumber.slice(k, k+n)
+			preprocessArray.push(slice)
+			k += n
+		}
+
+		if (k < plainNumber.length)
+		{
+			let slice: number[] = plainNumber.slice(k, plainNumber.length)
+			while (slice.length < n)
+			{
+				slice.push(23)
+			}
+			preprocessArray.push(slice)
+		}
+
+
+
+		const preprocessMatrix = new Matrix(preprocessArray.length,preprocessArray[0].length,preprocessArray)
+
+		console.log('pre matrix', preprocessMatrix)
+
+		const postprocessMatrix: Matrix = preprocessMatrix.multiply(matrix)
+
+		console.log('post matrix before mod', postprocessMatrix)
+
+		for (let i = 0; i < postprocessMatrix.rows; i++) {
+			for (let j = 0; j < postprocessMatrix.columns; j++) {
+				postprocessMatrix.values[i][j] = postprocessMatrix.at(i,j) % 26
+			}
+		}
+
+		console.log('post matrix after mod', postprocessMatrix)
+
+		let cipher: string = ""
+
+		for (let i = 0; i < postprocessMatrix.rows; i++) {
+			for (let j = 0; j < postprocessMatrix.columns; j++) {
+				cipher += String.fromCharCode(postprocessMatrix.at(i,j)+97)
+			}
+		}
+
+		console.log('cipher text',cipher)
+		this.cipher = cipher
+	}
+	hillDecrypt = (keyMatrix: number[][] | undefined) => {
+		const alternativeRemainder: any = (x:number) =>
+		{
+			return (x - Math.floor(x/26)*26) % 26
+		}
+		const extendedEuclid: any =  (x: number, y: number) =>
+		{
+			let u: number[] =  [1, 0 , x]
+			let v: number[] =  [0, 1, y]
+			while (u[2] !== 1)
+			{
+				let q = Math.floor(u[2] / v[2])
+				let t = [ u[0] - q*v[0], u[1] - q*v[1], u[2] - q*v[2] ]
+				u = [...v]
+				v = [...t]
+			}
+			return u
+		}
+		if (keyMatrix === undefined) return;
+		let matrix = new Matrix(keyMatrix.length, keyMatrix[0].length, keyMatrix)
+		if (matrix.determinant() === 0) {this.plain = 'Ma trận không khả nghịch'; return;}
+
+		const determinantOfMatrix = matrix.determinant()
+		const reminder = alternativeRemainder(determinantOfMatrix)
+		const inverseReminder = alternativeRemainder(extendedEuclid(reminder, 26)[0])
+
+		console.log('reminder', reminder)
+		console.log('Inverse Reminded', inverseReminder)
+
+		let cipherText = this.cipher
+
+		const n: number = keyMatrix.length
+
+		cipherText = cipherText.toLowerCase().trim()
+
+		while (cipherText.includes(" "))
+		{
+			cipherText = cipherText.replace(" ",'')
+		}
+
+		let cipherNumber = []
+
+		for (let i = 0 ; i < cipherText.length ; ++i)
+		{
+			cipherNumber.push(cipherText.charCodeAt(i)-97)
+		}
+
+		let preprocessArray: number[][] = []
+		let k = 0
+
+		while (k+n <= cipherNumber.length)
+		{
+			let slice: number[] = cipherNumber.slice(k, k+n)
+			preprocessArray.push(slice)
+			k += n
+		}
+
+		if (k < cipherNumber.length)
+		{
+			let slice: number[] = cipherNumber.slice(k, cipherNumber.length)
+			while (slice.length < n)
+			{
+				slice.push(23)
+			}
+			preprocessArray.push(slice)
+		}
+
+		const preprocessMatrix = new Matrix(preprocessArray.length,preprocessArray[0].length,preprocessArray)
+
+		console.log('preprocess matrix', preprocessMatrix)
+		let cofactorMatrix: number[][] | any =[]
+
+		for (let i = 0; i < matrix.rows; i++) {
+			const dummy: number[] = []
+			for (let j = 0; j < matrix.columns; j++) {
+				dummy.push(alternativeRemainder(Math.pow(-1, i+j )* matrix.getCofactor(i,j).determinant() * inverseReminder ) )
+			}
+			cofactorMatrix.push(dummy)
+		}
+
+		cofactorMatrix = new Matrix(cofactorMatrix.length, cofactorMatrix[0].length, cofactorMatrix).transpose()
+		console.log(cofactorMatrix)
+
+		const postprocessMatrix: Matrix = preprocessMatrix.multiply(cofactorMatrix)
+
+		console.log('post matrix before mod', postprocessMatrix)
+
+		for (let i = 0; i < postprocessMatrix.rows; i++) {
+			for (let j = 0; j < postprocessMatrix.columns; j++) {
+				postprocessMatrix.values[i][j] = postprocessMatrix.at(i,j) % 26
+			}
+		}
+
+		console.log('post matrix after mod', postprocessMatrix)
+
+		let plain: string = ""
+
+		for (let i = 0; i < postprocessMatrix.rows; i++) {
+			for (let j = 0; j < postprocessMatrix.columns; j++) {
+				plain += String.fromCharCode(postprocessMatrix.at(i,j)+97)
+			}
+		}
+
+		console.log('plaintext',plain)
+		this.plain = plain
 	}
 }
