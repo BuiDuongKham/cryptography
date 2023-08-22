@@ -17,6 +17,9 @@ export default function Home() {
 					<a href={'/vigenere'} className={'px-20 py-2 bg-blue-300 hover:text-white hover:bg-emerald-600 transition-all duration-500'}>
 						Vigerne
 					</a>
+					<a href={'/vernam'} className={'px-20 py-2 bg-blue-300 hover:text-white hover:bg-emerald-600 transition-all duration-500'}>
+						Vernam
+					</a>
 				</div>
 				<div className={'min-h-full px-20 mx-10 bg-teal-500'}>
 					Placeholder
