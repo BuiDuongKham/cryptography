@@ -90,7 +90,6 @@ export class Vigenere {
 		for (let i = 0; i < data.length; i++) {
 			let row: number = Ultis.charToAlphabetIndex(key[i]);
 			let col: number = Ultis.charToAlphabetIndex(data[i]);
-			console.log(row + " " + col);
 			result += this.lookupTable[row][col];
 		}
 

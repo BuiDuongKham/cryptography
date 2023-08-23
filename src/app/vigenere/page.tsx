@@ -15,6 +15,7 @@ export default function Home() {
 	// logic
 
 	useEffect(() => {
+		if (key === '') return
 		if (mode === 'encrypt') {
 			let myVigenere: Vigenere = new Vigenere(key)
 			setCipherText(myVigenere.encrypt(watch('text')))
