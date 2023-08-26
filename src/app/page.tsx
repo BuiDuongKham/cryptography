@@ -24,8 +24,10 @@ export default function Home() {
 						One time pad
 					</a>
 				</div>
-				<div className={'min-h-full px-20 mx-10 bg-teal-500'}>
-					Placeholder
+				<div className={'flex flex-col justify-center items-center min-h-full px-20 mx-10 bg-teal-500'}>
+					<a href={'/des'} className={'px-20 py-2 bg-blue-300 hover:text-white hover:bg-emerald-600 transition-all duration-500'}>
+						DES
+					</a>
 				</div>
 			</div>
 		</main>
