@@ -1,5 +1,4 @@
 import {Vector, Matrix} from "ts-matrix";
-import {undefined} from "zod";
 
 export class Crypto {
 	private _alphabet: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz'
