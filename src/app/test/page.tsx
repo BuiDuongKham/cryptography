@@ -5,12 +5,13 @@ import {Vernam} from "../../../functions/vernam";
 import {OneTimePad} from "../../../functions/onetimepad";
 import {Des} from "../../../functions/des";
 import {Aes} from "../../../functions/aes";
+import {Crypto} from "../../../functions/crypto";
 
 export default function Home() {
-	const myAES = new Aes('0f1571c947d9e8590cb7add6af7f6798');
-	console.log(myAES.decrypt('ff0b844a0853bf7c6934ab4364148fb9'))
-	// b1f334b26fdbf79ae06796fbc9468607
-	// b1f334b26fdbf79ae06796fbc9468607
+	const myPlayfair : Crypto = new Crypto();
+	myPlayfair.plain = "Communicate"
+	myPlayfair.playfairEncrypt("computer")
+	console.log(myPlayfair.cipher)
 	return (
 		<></>
 	)

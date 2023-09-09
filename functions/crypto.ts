@@ -1,5 +1,7 @@
 import {Vector, Matrix} from "ts-matrix";
 import {relativizeURL} from "next/dist/shared/lib/router/utils/relativize-url";
+import {length} from "postcss";
+import {undefined} from "zod";
 
 export class Crypto {
 	private _alphabet: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz'
@@ -7,8 +9,10 @@ export class Crypto {
 	private _cipher: string = ''
 	private _key: any
 	private _playfairTable: any;
+	private _isPlayfairPadding: boolean = false;
 	constructor(alphabet?: string) {
 		if (alphabet) this._alphabet = alphabet
+		this._isPlayfairPadding = false;
 	}
 
 	createRandomString = (length: number) => {
@@ -169,6 +173,7 @@ export class Crypto {
 				} else
 				{
 					let cluster: string = temporaryWord[0] + "x"
+					this._isPlayfairPadding = true;
 					saveClusters.push(cluster)
 					temporaryWord = temporaryWord.slice(1)
 				}
@@ -342,6 +347,22 @@ export class Crypto {
 			plain.push(result[0]+result[1])
 		}
 		this._plain = plain.reduce((x, y, i) => y = x+ plain[i], "")
+		if (this.isPlayfairPadding)
+		{
+			let newPlain: string = "";
+			for (let i = 0; i < this._plain.length; ++i)
+			{
+				if (this._plain[i] === 'x' && this._plain[i+1] === this._plain[i-1])
+				{
+					newPlain += this._plain[i+1]
+					i+=1
+				} else
+				{
+					newPlain += this._plain[i]
+				}
+			}
+			this._plain = newPlain
+		}
 	}
 
 	hillEncrypt = (keyMatrix: number[][] | undefined) => {
@@ -521,5 +542,13 @@ export class Crypto {
 
 		console.log('plaintext',plain)
 		this.plain = plain
+	}
+	
+	get isPlayfairPadding(): boolean {
+		return this._isPlayfairPadding;
+	}
+	
+	set isPlayfairPadding(value: boolean) {
+		this._isPlayfairPadding = value;
 	}
 }
