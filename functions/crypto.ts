@@ -186,7 +186,9 @@ export class Crypto {
 			let i = array.indexOf(value), temp;
 			if (i !== -1) return [i];
 			i = array.findIndex(v => temp = findIndex(v, value));
-			if (i !== -1) return [i, ...temp];
+			if (i !== -1) { // @ts-ignore
+				return [i, ...temp];
+			}
 		}
 
 		const cipher: string[] = []
@@ -307,7 +309,9 @@ export class Crypto {
 			let i = array.indexOf(value), temp;
 			if (i !== -1) return [i];
 			i = array.findIndex(v => temp = findIndex(v, value));
-			if (i !== -1) return [i, ...temp];
+			if (i !== -1) { // @ts-ignore
+				return [i, ...temp];
+			}
 		}
 
 		const plain: string[] = []
@@ -409,19 +413,13 @@ export class Crypto {
 
 		const preprocessMatrix = new Matrix(preprocessArray.length,preprocessArray[0].length,preprocessArray)
 
-		console.log('pre matrix', preprocessMatrix)
-
 		const postprocessMatrix: Matrix = preprocessMatrix.multiply(matrix)
-
-		console.log('post matrix before mod', postprocessMatrix)
 
 		for (let i = 0; i < postprocessMatrix.rows; i++) {
 			for (let j = 0; j < postprocessMatrix.columns; j++) {
 				postprocessMatrix.values[i][j] = postprocessMatrix.at(i,j) % 26
 			}
 		}
-
-		console.log('post matrix after mod', postprocessMatrix)
 
 		let cipher: string = ""
 
@@ -431,7 +429,6 @@ export class Crypto {
 			}
 		}
 
-		console.log('cipher text',cipher)
 		this.cipher = cipher
 	}
 	hillDecrypt = (keyMatrix: number[][] | undefined) => {
