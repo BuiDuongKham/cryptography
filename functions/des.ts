@@ -53,7 +53,6 @@ export class Des {
 			[23, 24, 25, 26, 27, 28],
 			[27, 28, 29, 30, 31, 0]
 		]
-	// oh, wtf, why???? why my fukin teacher and the fuckin book don't me that this funkin table have 3 duumb ass dim.
 	private _sBox: number[][][] =
 		[
 			[

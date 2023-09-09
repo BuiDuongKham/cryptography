@@ -11,6 +11,7 @@ export default function Playfair() {
 	const [playfairTable, setPlayfairTable] = React.useState<any[][] | undefined>(undefined)
 	const [cipherText, setCipherText] = React.useState<string>('')
 	const [mode, setMode] = React.useState('encrypt')
+	const [isPadding, setIsPadding] = React.useState(false)
 	// logic
 
 	useEffect(() => {
@@ -20,16 +21,17 @@ export default function Playfair() {
 			myCrypto.playfairEncrypt(myCrypto.key)
 			setPlayfairTable(myCrypto.playfairTable)
 			setCipherText(myCrypto.cipher)
-			console.log(myCrypto)
+			setIsPadding(myCrypto.isPlayfairPadding)
 		}
 		else {
+			myCrypto.isPlayfairPadding = isPadding
 			myCrypto.cipher = watch('text')
 			myCrypto.key = key
 			myCrypto.playfairDecrypt(myCrypto.key)
 			setPlayfairTable(myCrypto.playfairTable)
 			setPlainText(myCrypto.plain)
-			console.log(myCrypto)
 		}
+		console.log(isPadding)
 	}, [watch('text'), key, mode])
 
 	return (
