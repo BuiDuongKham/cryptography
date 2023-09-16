@@ -107,7 +107,7 @@ export class BigIntOperator
 
 	public static getInverseModulo(a: bigint, n: bigint)
 	{
-		debugger;
+		// debugger;
 		let u =  [BigInt('1'), BigInt('0'), a];
 		let v = [BigInt('0'), BigInt('1'), n];
 		

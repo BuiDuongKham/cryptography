@@ -174,7 +174,7 @@ export class Des {
 	}
 	
 	public generateKey(): number[][] {
-		debugger;
+		// debugger;
 		let key: number[] = this.getFirstCompressionKey();
 		const result: number[][] = [];
 		
