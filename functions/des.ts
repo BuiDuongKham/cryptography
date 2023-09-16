@@ -1,3 +1,5 @@
+import {debug} from "util";
+
 export class Des {
 	private _key: number[] = [];
 	private _firstCompressionKeyTable: number[][] =
@@ -172,6 +174,7 @@ export class Des {
 	}
 	
 	public generateKey(): number[][] {
+		debugger;
 		let key: number[] = this.getFirstCompressionKey();
 		const result: number[][] = [];
 		

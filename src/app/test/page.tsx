@@ -7,10 +7,11 @@ import {Des} from "../../../functions/des";
 import {Aes} from "../../../functions/aes";
 import {Crypto} from "../../../functions/crypto";
 import {BigIntOperator} from "../../../functions/BigIntOperator";
+import {RSA} from "../../../functions/RSA";
 
 export default function Home() {
-	// console.log(BigNumber.divide("10020121234567890123456789023456789", "70002345678923456789"))
-	console.log(BigIntOperator.littleFermat(1000000000000000000000000000000000000000000000000000000000000000000000000000000084878086452295590311n, 3));
+	console.log(RSA.encrypt(BigInt("73"), BigInt("151"), BigInt("11"), 'How are you', 2));
+	console.log(RSA.decrypt(BigInt("73"), BigInt("151"), BigInt("11"), [BigInt('10260'), BigInt('9489'), BigInt('1782'), BigInt('727'), BigInt('10032'), BigInt('9278')], 2))
 	return (
 		<></>
 	)

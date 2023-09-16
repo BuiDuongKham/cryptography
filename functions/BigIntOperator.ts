@@ -1,42 +1,51 @@
-import {debug} from "util";
-
 export class BigIntOperator 
 {
-	// public static milerRabinTest(n: bigint, k: number): boolean
-	// {
-	// 	if (n === 2n || n === 3n) return true;
-	// 	if (n < 2n || n % 2n === 0n) return false;
-	//
-	// 	let s = 0n;
-	// 	let d = n - 1n;
-	// 	while (d % 2n === 0n) 
-	// 	{
-	// 		d /= 2n;
-	// 		s++;
-	// 	}
-	//
-	// 	loop: for (let i = 0; i < k; i++) 
-	// 	{
-	// 		const a = BigIntOperator.getRandomBigInt(2n, n - 2n);
-	// 		let x = BigIntOperator.modPow(a, d, n);
-	//
-	// 		if (x === 1n || x === n - 1n) continue;
-	//
-	// 		for (let r = 1n; r < s; r++) 
-	// 		{
-	// 			x = BigIntOperator.modPow(x, 2n, n);
-	// 			if (x === 1n) return false;
-	// 			if (x === n - 1n) continue loop;
-	// 		}
-	//
-	// 		return false;
-	// 	}
-	//
-	// 	return true;
-	// }
+	public static millerRabinTest(n: bigint, k: number): boolean
+	{
+		if (n === BigInt('2') || n === BigInt('3')) return true;
+		if (n < BigInt('2') || n % BigInt('2') === BigInt('0')) return false;
+		// debugger;
+		for (let i = 0; i < k; i++) {
+			const a = BigIntOperator.getRandomBigInt(BigInt('2n'), n - BigInt('2n'));
+			if (!BigIntOperator.millerRabinTestHelper(n, a)) return false;
+		}
+		return true;
+	}
+	private static millerRabinTestHelper(n: bigint, a: bigint) {
+		const k = BigIntOperator.getTwoPower(n - BigInt('1'));
+		const s = BigIntOperator.exponentiation(BigInt('2'), k)
+		let d = n / s;
+		let x = BigIntOperator.modPow(a, d, n);
+		if (x === BigInt('1') || x === n - BigInt('1')) return true;
+		for (let i = BigInt('1'); i <= k; i++) {
+			let z1 = BigIntOperator.modPow(x, BigIntOperator.exponentiation(BigInt('2'),i)*d, n) === BigInt('1');
+			let z2 = BigIntOperator.modPow(x, BigIntOperator.exponentiation(BigInt('2'),i-BigInt('1'))*d, n) === n - BigInt('1');
+			if ( z1 && z2) return true;
+		}
+		return false;
+	}
+	public static getTwoPower(n: bigint): bigint {
+		let result = BigInt('1');
+		let k = BigInt('0');
+		while (result * BigInt('2') < n && n % (result * BigInt('2')) === BigInt('0')) {
+			result *= BigInt('2');
+			k++;
+		}
+		return k;
+	}
 	
-	public static MIN_BIGINT = 1234567890123456789012345678901234567890n;
-	public static MAX_BIGINT = 9876543210987654321098765432109876543210n;
+	public static exponentiation(base: bigint, exponent: bigint): bigint
+	{
+		let result = BigInt('1');
+		for (let i = BigInt('0'); i < exponent; i++)
+		{
+			result *= base;
+		}
+		return result;
+	}
+	
+	public static MIN_BIGINT = BigInt('1234567890123456789012345678901234567890');
+	public static MAX_BIGINT = BigInt('9876543210987654321098765432109876543210');
 	public static getRandomBigInt(min: bigint , max: bigint ): bigint
 	{
 		if (min === undefined) min = BigIntOperator.MIN_BIGINT;
@@ -44,13 +53,13 @@ export class BigIntOperator
 		const range = max - min;
 		const bits = range.toString(2).length;
 		
-		let result = 0n;
+		let result = BigInt('0');
 		do
 		{
-			result = 0n;
+			result = BigInt('0');
 			for (let i = 0; i < bits; i++)
 			{
-				result = result * 2n + BigInt(Math.random() > 0.5 ? 1 : 0);
+				result = result * BigInt('2') + BigInt(Math.random() > 0.5 ? 1 : 0);
 			}
 		}
 		while (result > range);
@@ -60,28 +69,45 @@ export class BigIntOperator
 	
 	
 	public static modPow(base: bigint, exponent: bigint, n: bigint): bigint {
-		if (exponent === 0n) return 1n;
-		if (exponent === 1n) return BigInt(base) % BigInt(n);
-		if (exponent % 2n === 0n){
-			const root = BigIntOperator.modPow(base, exponent / 2n, n);
+		if (exponent === BigInt('0')) return BigInt('1');
+		if (exponent === BigInt('1')) return BigInt(base) % BigInt(n);
+		if (exponent % BigInt('2') === BigInt('0')){
+			const root = BigIntOperator.modPow(base, exponent / BigInt('2'), n);
 			return root * root % n;
 		}
-		const root = BigIntOperator.modPow(base, (exponent - 1n) / 2n, n);
+		const root = BigIntOperator.modPow(base, (exponent - BigInt('1')) / BigInt('2'), n);
 		return root * root * base % n;
 	}
 	
 	public static littleFermat(n: bigint, k: number): boolean
 	{
 		// debugger;
-		if (n === 2n || n === 3n) return true;
-		if (n < 2n || n % 2n === 0n) return false;
+		if (n === BigInt('2') || n === BigInt('3')) return true;
+		if (n < BigInt('2') || n % BigInt('2') === BigInt('0')) return false;
 		
 		for (let i = 0; i < k; i++)
 		{
-			const a = BigIntOperator.getRandomBigInt(2n, n - 2n);
-			if (BigIntOperator.modPow(a, n - 1n, n) !== 1n) return false;
+			const a = BigIntOperator.getRandomBigInt(BigInt('2'), n - BigInt('2'));
+			if (BigIntOperator.modPow(a, n - BigInt('1'), n) !== BigInt('1')) return false;
 		}
 		
 		return true;
 	}
+
+	public static getInverseModulo(a: bigint, n: bigint)
+	{
+		debugger;
+		let u =  [BigInt('1'), BigInt('0'), a];
+		let v = [BigInt('0'), BigInt('1'), n];
+		
+		while (u[2] != BigInt('1'))
+		{
+				let q = u[2]/v[2];
+				let cloneU = [...u];
+				u = [...v];
+				v = [ cloneU[0] - q*v[0], cloneU[1] - q*v[1], cloneU[2] - q*v[2] ];
+		}
+		return (u[0] + n)%n;
+	}
+	
 }

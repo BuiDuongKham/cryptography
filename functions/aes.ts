@@ -149,7 +149,7 @@ export class Aes {
 	}
 	
 	public generateRoundKeys = (): number[][] => {
-		
+		debugger;	
 		if (this.numberOfWords === 8) {
 			const keys: number[][] = []
 			
