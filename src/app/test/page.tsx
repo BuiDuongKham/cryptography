@@ -6,12 +6,12 @@ import {OneTimePad} from "../../../functions/onetimepad";
 import {Des} from "../../../functions/des";
 import {Aes} from "../../../functions/aes";
 import {Crypto} from "../../../functions/crypto";
+import {BigIntOperator} from "../../../functions/BigIntOperator";
+import {RSA} from "../../../functions/RSA";
 
 export default function Home() {
-	const myPlayfair : Crypto = new Crypto();
-	myPlayfair.plain = "Communicate"
-	myPlayfair.playfairEncrypt("computer")
-	console.log(myPlayfair.cipher)
+	console.log(RSA.encrypt(BigInt("73"), BigInt("151"), BigInt("11"), 'How are you', 2));
+	console.log(RSA.decrypt(BigInt("73"), BigInt("151"), BigInt("11"), [BigInt('10260'), BigInt('9489'), BigInt('1782'), BigInt('727'), BigInt('10032'), BigInt('9278')], 2))
 	return (
 		<></>
 	)
