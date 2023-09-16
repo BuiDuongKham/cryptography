@@ -31,6 +31,9 @@ export default function Home() {
 					<a href={'/aes'} className={'px-20 py-2 bg-blue-300 hover:text-white hover:bg-emerald-600 transition-all duration-500'}>
 						AES
 					</a>
+					<a href={'/rsa'} className={'px-20 py-2 bg-blue-300 hover:text-white hover:bg-emerald-600 transition-all duration-500'}>
+						RSA
+					</a>
 				</div>
 			</div>
 		</main>

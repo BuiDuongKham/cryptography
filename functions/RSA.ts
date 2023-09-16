@@ -2,12 +2,8 @@ import {BigIntOperator} from "./BigIntOperator";
 
 export class RSA{
 	public static  ALPHABET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ";
-	public static encrypt(p: bigint, q: bigint, e: bigint, message: string, sizeOfChunk: number){
+	public static encrypt(e: bigint, n: bigint, message: string, sizeOfChunk: number){
 		// debugger;
-		const n : bigint =  p*q;
-		const phi : bigint = (p-BigInt('1')) * (q- BigInt('1'));
-		if (e > phi) return "Cannot encrypt because of e";
-		const d : bigint = BigIntOperator.getInverseModulo(e, phi);
 		
 		// remove all non-alphabet characters
 		// message = message.replace(/[^a-zA-Z0-9]/g, '');
@@ -29,11 +25,7 @@ export class RSA{
 		return result;	
 	}
 	
-	public static decrypt(p: bigint, q: bigint, e: bigint, encryptedMessage: bigint[], sizeOfChunk: number) {
-		const n: bigint = p * q;
-		const phi: bigint = (p - BigInt('1')) * (q - BigInt('1'));
-		if (e > phi) return "Cannot encrypt because of e";
-		const d: bigint = BigIntOperator.getInverseModulo(e, phi);
+	public static decrypt(d: bigint, n: bigint, encryptedMessage: bigint[], sizeOfChunk: number) {
 		
 		let result = "";
 		for (let i = 0; i < encryptedMessage.length; i++)

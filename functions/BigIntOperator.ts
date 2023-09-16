@@ -6,7 +6,7 @@ export class BigIntOperator
 		if (n < BigInt('2') || n % BigInt('2') === BigInt('0')) return false;
 		// debugger;
 		for (let i = 0; i < k; i++) {
-			const a = BigIntOperator.getRandomBigInt(BigInt('2n'), n - BigInt('2n'));
+			const a = BigIntOperator.getRandomBigInt(BigInt('2'), n - BigInt('2'));
 			if (!BigIntOperator.millerRabinTestHelper(n, a)) return false;
 		}
 		return true;
@@ -93,6 +93,17 @@ export class BigIntOperator
 		
 		return true;
 	}
+	
+	public static genN(p: bigint, q: bigint): bigint
+	{
+		return p * q;
+	}
+	
+	public static genD(p: bigint, q: bigint, e: bigint): bigint
+	{
+		const phi = (p - BigInt('1')) * (q - BigInt('1'));
+		return BigIntOperator.getInverseModulo(e, phi);
+	}
 
 	public static getInverseModulo(a: bigint, n: bigint)
 	{
@@ -109,5 +120,17 @@ export class BigIntOperator
 		}
 		return (u[0] + n)%n;
 	}
+	public static getGCD(a: bigint, b: bigint): bigint
+	{
+		if (b === BigInt('0')) return a;
+		if (a === BigInt('0')) return b;
+		return BigIntOperator.getGCD(b, a%b);
+	}
 	
+	public static checkEValid(p: bigint, q: bigint, e: bigint):boolean
+	{
+		const phi = (p - BigInt('1')) * (q - BigInt('1'))
+		return BigIntOperator.getGCD(e, phi) === BigInt('1');
+		
+	}
 }
