@@ -1,3 +1,5 @@
+import {League_Gothic} from "next/dist/compiled/@next/font/dist/google";
+
 export class BigIntOperator 
 {
 	public static millerRabinTest(n: bigint, k: number): boolean
@@ -132,5 +134,43 @@ export class BigIntOperator
 		const phi = (p - BigInt('1')) * (q - BigInt('1'))
 		return BigIntOperator.getGCD(e, phi) === BigInt('1');
 		
+	}
+	
+	
+	// Utilities for Diffie-Hellman key exchange
+	
+	public static getPrimitiveRootOfPrimeNumber(p: bigint): bigint
+	{
+		const primitiveRoots :bigint[] = [];
+		for (let i = BigInt('2'); i < p; i++)
+		{
+			if (BigIntOperator.isPrimitiveRootOfPrimeNumber(p, i))  primitiveRoots.push(i);
+		}
+		return primitiveRoots[Math.floor(Math.random() * primitiveRoots.length)];
+	}
+	
+	public static isPrimitiveRootOfPrimeNumber(p: bigint, i: bigint) {
+		if (BigIntOperator.getGCD(i, p) !== BigInt('1')) return false;
+		const phi = p - BigInt('1');
+		const factors = BigIntOperator.getFactors(phi);
+		const array = Array.from(factors);
+		for (let j = 0; j < array.length; j++) {
+			if (BigIntOperator.modPow(i, phi / array[j], p) === BigInt('1')) return false;
+		}
+		return true;
+	}
+	
+	private static getFactors(phi: bigint) {
+		const result = new Set<bigint>();
+		let divisor = BigInt('2');
+		while (phi > BigInt('1')) {
+			if (phi % divisor === BigInt('0')) {
+				result.add(divisor);
+				phi /= divisor;
+			} else {
+				divisor++;
+			}
+		}
+		return result;
 	}
 }
