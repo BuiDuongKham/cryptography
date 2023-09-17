@@ -72,7 +72,7 @@ export default function CeasarPage() {
 					<div className={'flex justify-center mt-5'}>
 						<button className={'px-20 py-2 bg-blue-300 hover:text-white hover:bg-emerald-600 transition-all duration-500'} onClick={() => {
 							if (mode === 'encrypt') {
-								if (!BigIntOperator.isContainOnlyDigit(plainText)) return
+								if ( plainText === "" || !BigIntOperator.isContainOnlyDigit(plainText)) return
 								const encryptedKeyPackage: EncryptedMessage = ElGamma.encrypt(BigInt(plainText), BigInt(k), {q: BigInt(q), alpha: BigInt(alpha), y: BigInt(key)})
 								setEncryptedKey(encryptedKeyPackage)
 							}
