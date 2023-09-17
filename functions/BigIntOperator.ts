@@ -173,4 +173,11 @@ export class BigIntOperator
 		}
 		return result;
 	}
+	
+	public static isContainOnlyDigit = (s: string) => {
+	for (let i = 0; i < s.length; i++){
+		if (s[i] < '0' || s[i] > '9') return false;
+	}
+	return true;
+	}
 }
