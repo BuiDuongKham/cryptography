@@ -180,4 +180,41 @@ export class BigIntOperator
 	}
 	return true;
 	}
+	
+	
+	public static I2OSP(x: bigint, xLen: number): string
+	{
+		if (x > BigIntOperator.exponentiation(BigInt('128'), BigInt(xLen))) throw new Error('integer too large');
+		let result = '';
+		while (x > BigInt('0'))
+		{
+			const byte = (x % BigInt('256')).toString(16).padStart(2, '0');
+			result = byte + result;
+			x /= BigInt('256');
+		}
+		return result;
+	}
+	
+	public static OS2IP(x: string): bigint
+	{
+		let result = BigInt('0');
+		for (let i = 0; i <x.length ; ++i)
+		{
+			result = result * BigInt('16') + BigInt('0x' + x[i]);
+		}
+		return result;
+	}
+	
+	public static S2OS(x: string): string
+	{
+		let result = "";
+		let cloneX = x;
+		while (cloneX.length >0)
+		{
+			const byte = cloneX.substring(0, 1);
+			result = result + byte.charCodeAt(0).toString(16).padStart(2, '0');
+			cloneX = cloneX.substring(1);
+		}
+		return result;
+	}
 }

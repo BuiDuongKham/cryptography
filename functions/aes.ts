@@ -111,6 +111,20 @@ export class Aes {
 		this.key = key
 	}
 	
+	public sBoxToHexa()
+	{
+		for (let i = 0; i< this.sBox.length; i++)
+		{
+			let s: string= "";
+			for (let j = 0; j < this.sBox[i].length; j++)
+			{
+				 s+=this.sBox[i][j].toString(16).padStart(2, '0');
+				 s+=" ";
+			}
+			console.log(s);
+		}
+	}
+	
 	public g = (word: number[], rcon: number[]): number[] => {
 		// rotword
 		const rotWord: number[] = [...word.slice(2, 8).concat(word.slice(0, 2))]

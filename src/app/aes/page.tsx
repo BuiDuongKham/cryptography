@@ -19,9 +19,13 @@ export default function AESPage() {
 		}
 		const myAes : Aes = new Aes(key)
 		if (mode === 'encrypt') {
-			setCipherText(myAes.encrypt(watch('text')))
+			setCipherText(
+				myAes.encrypt(watch('text'))
+			)
 		} else {
-			setPlainText(myAes.decrypt(watch('text')))
+			setPlainText(
+				myAes.decrypt(watch('text'))
+			)
 		}
 	}
 	
