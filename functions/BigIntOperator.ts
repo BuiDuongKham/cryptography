@@ -1,5 +1,3 @@
-import {League_Gothic} from "next/dist/compiled/@next/font/dist/google";
-
 export class BigIntOperator 
 {
 	public static millerRabinTest(n: bigint, k: number): boolean
